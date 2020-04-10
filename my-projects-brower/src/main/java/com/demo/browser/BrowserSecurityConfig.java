@@ -1,5 +1,7 @@
 package com.demo.browser;
 
+import com.demo.browser.authentication.MyAuthenticationFailureHandler;
+import com.demo.browser.authentication.MyAuthenticationSuccessHandler;
 import com.demo.core.properties.SecurityProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -28,18 +30,18 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private SecurityProperties securityProperties;
 
-    /**
-     * 密码加密
-     * @return
-     */
+    @Autowired
+    private MyAuthenticationSuccessHandler authenticationSuccessHandler;
+
+    @Autowired
+    private MyAuthenticationFailureHandler authenticationFailureHandler;
+
+    @Autowired
+    private MyUserDetailService userDetailService;
+
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService(){
-        return new MyUserDetailService();
     }
 
 
@@ -49,8 +51,10 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
         http.formLogin()
                 .loginPage("/authentication/require")
                 .loginProcessingUrl("/authentication/form")
+                .successHandler(authenticationSuccessHandler)
+                .failureHandler(authenticationFailureHandler)
                 .and()
-                .userDetailsService(userDetailsService())
+                .userDetailsService(userDetailService)
                 .authorizeRequests()
                 .antMatchers("/authentication/require",securityProperties.getBrowser().getLoginPage()).permitAll()
                 .anyRequest()
