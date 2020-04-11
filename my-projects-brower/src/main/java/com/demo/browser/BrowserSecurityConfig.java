@@ -3,6 +3,7 @@ package com.demo.browser;
 import com.demo.browser.authentication.MyAuthenticationFailureHandler;
 import com.demo.browser.authentication.MyAuthenticationSuccessHandler;
 import com.demo.core.properties.SecurityProperties;
+import com.demo.core.validate.code.ValidateCodeFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * 原理：过滤器链
@@ -48,7 +50,13 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        http.formLogin()
+        ValidateCodeFilter validateCodeFilter = new ValidateCodeFilter();
+        validateCodeFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
+        validateCodeFilter.setSecurityProperties(securityProperties);
+        validateCodeFilter.afterPropertiesSet();
+        http
+                .addFilterBefore(validateCodeFilter, UsernamePasswordAuthenticationFilter.class)
+                .formLogin()
                 .loginPage("/authentication/require")
                 .loginProcessingUrl("/authentication/form")
                 .successHandler(authenticationSuccessHandler)
@@ -56,7 +64,8 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .userDetailsService(userDetailService)
                 .authorizeRequests()
-                .antMatchers("/authentication/require",securityProperties.getBrowser().getLoginPage()).permitAll()
+                .antMatchers("/authentication/require",securityProperties.getBrowser().getLoginPage(),
+                        "/code/image").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
