@@ -58,14 +58,13 @@ public class ValidateCodeFilter extends OncePerRequestFilter implements Initiali
                 authenticationFailureHandler.onAuthenticationFailure(request,response,e);
                 return;
             }
-        }else {
-            filterChain.doFilter(request,response);
         }
+        filterChain.doFilter(request,response);
     }
 
     private void validate(ServletWebRequest request) throws ServletRequestBindingException {
 
-        ImageCode codeInSession = (ImageCode) sessionStrategy.getAttribute(request,SecurityConstants.DEFAULT_PARAMETER_NAME_CODE_IMAGE);
+        ImageCode codeInSession = (ImageCode) sessionStrategy.getAttribute(request, "IMAGE");
 
         if(codeInSession == null){
             throw new ValidateCodeException("验证码不存在");
