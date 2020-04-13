@@ -6,6 +6,7 @@ import com.demo.core.validate.code.ValidateCodeGenerator;
 import com.demo.core.validate.code.image.ImageCodeGenerator;
 import com.demo.core.validate.code.service.SmsCodeSender;
 import com.demo.core.validate.code.service.impl.DefaultSmsCodeSender;
+import com.demo.core.validate.code.sms.SmsCodeGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -26,8 +27,16 @@ public class ValidateCodeBeanConfig {
     }
 
     @Bean
+    @ConditionalOnMissingBean(name = "smsCodeGenerator")
+    public ValidateCodeGenerator smsCodeGenerator(){
+        SmsCodeGenerator smsCodeGenerator = new SmsCodeGenerator();
+        smsCodeGenerator.setSecurityProperties(securityProperties);
+        return smsCodeGenerator;
+    }
+
+    @Bean
     @ConditionalOnMissingBean(SmsCodeSender.class)
-    public SmsCodeSender smsCodeGenerator(){
+    public SmsCodeSender smsCodeSender(){
         return new DefaultSmsCodeSender();
     }
 }
