@@ -1,8 +1,10 @@
-package com.demo.core.validate.code;
+package com.demo.core.authentication.mobile;
 
 import com.demo.core.properties.SecurityConstants;
 import com.demo.core.properties.SecurityProperties;
+import com.demo.core.validate.code.ValidateCodeException;
 import com.demo.core.validate.code.dto.ImageCode;
+import com.demo.core.validate.code.dto.ValidateCode;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -22,7 +24,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ValidateCodeFilter extends OncePerRequestFilter implements InitializingBean {
+public class SmsCodeFilter extends OncePerRequestFilter implements InitializingBean {
 
     private AuthenticationFailureHandler authenticationFailureHandler;
     private SessionStrategy sessionStrategy = new HttpSessionSessionStrategy();
@@ -32,8 +34,8 @@ public class ValidateCodeFilter extends OncePerRequestFilter implements Initiali
 
     @Override
     public void afterPropertiesSet() throws ServletException {
-        String url = securityProperties.getCode().getImage().getUrl();
-        urls.add("/authentication/form");
+        String url = securityProperties.getCode().getSms().getUrl();
+        urls.add("/authentication/mobile");
         if(StringUtils.isBlank(url)){
             return;
         }
@@ -67,20 +69,20 @@ public class ValidateCodeFilter extends OncePerRequestFilter implements Initiali
 
     private void validate(ServletWebRequest request) throws ServletRequestBindingException {
 
-        ImageCode codeInSession = (ImageCode) sessionStrategy.getAttribute(request, "IMAGE");
+        ValidateCode codeInSession = (ValidateCode) sessionStrategy.getAttribute(request, "SMS");
 
         if(codeInSession == null){
             throw new ValidateCodeException("验证码不存在");
         }
 
-        String codeInRequest = ServletRequestUtils.getStringParameter(request.getRequest(), "imageCode");
+        String codeInRequest = ServletRequestUtils.getStringParameter(request.getRequest(), "smsCode");
 
         if(StringUtils.isBlank(codeInRequest)){
             throw new ValidateCodeException("验证码的值不能为空");
         }
 
         if(codeInSession.isExpired()){
-            sessionStrategy.removeAttribute(request,"IMAGE");
+            sessionStrategy.removeAttribute(request,"SMS");
             throw new ValidateCodeException("验证码已过期");
         }
 
@@ -88,8 +90,7 @@ public class ValidateCodeFilter extends OncePerRequestFilter implements Initiali
             throw  new ValidateCodeException("验证码不匹配");
         }
 
-        sessionStrategy.removeAttribute(request, "IMAGE");
-
+        sessionStrategy.removeAttribute(request, "SMS");
 
     }
 

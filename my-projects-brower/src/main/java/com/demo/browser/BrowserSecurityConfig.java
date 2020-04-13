@@ -2,6 +2,8 @@ package com.demo.browser;
 
 import com.demo.browser.authentication.MyAuthenticationFailureHandler;
 import com.demo.browser.authentication.MyAuthenticationSuccessHandler;
+import com.demo.core.authentication.mobile.SmsCodeAuthenticationSecurityConfig;
+import com.demo.core.authentication.mobile.SmsCodeFilter;
 import com.demo.core.properties.SecurityProperties;
 import com.demo.core.validate.code.ValidateCodeFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,9 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private DataSource dataSource;
 
+    @Autowired
+    private SmsCodeAuthenticationSecurityConfig smsCodeAuthenticationSecurityConfig;
+
     @Bean
     @ConditionalOnMissingBean(MyUserDetailService.class)
     public UserDetailsService userDetailsService(){
@@ -73,6 +78,11 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
         validateCodeFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
         validateCodeFilter.setSecurityProperties(securityProperties);
         validateCodeFilter.afterPropertiesSet();
+
+        SmsCodeFilter smsCodeFilter = new SmsCodeFilter();
+        smsCodeFilter.setAuthenticationFailureHandler(authenticationFailureHandler);
+        smsCodeFilter.setSecurityProperties(securityProperties);
+        smsCodeFilter.afterPropertiesSet();
         http
                 .addFilterBefore(validateCodeFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin()
@@ -91,7 +101,8 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest()
                 .authenticated()
                 .and()
-                .csrf().disable();
+                .csrf().disable()
+                .apply(smsCodeAuthenticationSecurityConfig);
     }
 
     @Override
