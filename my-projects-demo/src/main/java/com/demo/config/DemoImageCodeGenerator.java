@@ -1,8 +1,7 @@
 package com.demo.config;
 
-import com.demo.core.validate.code.ImageCode;
+import com.demo.core.validate.code.dto.ImageCode;
 import com.demo.core.validate.code.ValidateCodeGenerator;
-import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.ServletWebRequest;
 
 

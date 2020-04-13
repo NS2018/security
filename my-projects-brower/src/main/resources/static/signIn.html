@@ -34,5 +34,28 @@
             </tr>
         </table>
     </form>
+
+
+    <h3>短信登录</h3>
+    <form action="/authentication/mobile" method="post">
+        <table>
+            <tr>
+                <td>mobile:</td>
+                <td><input type="text" name="mobile" value="18737114330"> </td>
+            </tr>
+            <tr>
+                <td>sms code:</td>
+                <td>
+                    <input type="text" name="smsCode">
+                    <a href="/code/sms?mobile=18737114330">send</a>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <button type="submit">login</button>
+                </td>
+            </tr>
+        </table>
+    </form>
 </body>
 </html>

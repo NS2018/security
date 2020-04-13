@@ -1,11 +1,12 @@
-package com.demo.core.validate.code;
+package com.demo.core.validate.code.image;
 
 import com.demo.core.properties.SecurityProperties;
+import com.demo.core.validate.code.dto.ImageCode;
+import com.demo.core.validate.code.ValidateCodeGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Random;

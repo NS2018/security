@@ -1,4 +1,4 @@
-package com.demo.core;
+package com.demo.core.validate.code.config;
 
 
 import com.demo.core.properties.SecurityProperties;

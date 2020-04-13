@@ -1,6 +1,8 @@
 package com.demo.core.validate.code;
 
+import com.demo.core.properties.SecurityConstants;
 import com.demo.core.properties.SecurityProperties;
+import com.demo.core.validate.code.dto.ImageCode;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -63,7 +65,7 @@ public class ValidateCodeFilter extends OncePerRequestFilter implements Initiali
 
     private void validate(ServletWebRequest request) throws ServletRequestBindingException {
 
-        ImageCode codeInSession = (ImageCode) sessionStrategy.getAttribute(request,ValidateCodeController.SESSION_KEY);
+        ImageCode codeInSession = (ImageCode) sessionStrategy.getAttribute(request,SecurityConstants.DEFAULT_PARAMETER_NAME_CODE_IMAGE);
 
         if(codeInSession == null){
             throw new ValidateCodeException("验证码不存在");
@@ -76,7 +78,7 @@ public class ValidateCodeFilter extends OncePerRequestFilter implements Initiali
         }
 
         if(codeInSession.isExpired()){
-            sessionStrategy.removeAttribute(request,ValidateCodeController.SESSION_KEY);
+            sessionStrategy.removeAttribute(request,SecurityConstants.DEFAULT_PARAMETER_NAME_CODE_IMAGE);
             throw new ValidateCodeException("验证码已过期");
         }
 
@@ -84,7 +86,7 @@ public class ValidateCodeFilter extends OncePerRequestFilter implements Initiali
             throw  new ValidateCodeException("验证码不匹配");
         }
 
-        sessionStrategy.removeAttribute(request,ValidateCodeController.SESSION_KEY);
+        sessionStrategy.removeAttribute(request, SecurityConstants.DEFAULT_PARAMETER_NAME_CODE_IMAGE);
 
 
     }
