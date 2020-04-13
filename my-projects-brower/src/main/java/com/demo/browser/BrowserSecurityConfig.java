@@ -5,14 +5,20 @@ import com.demo.browser.authentication.MyAuthenticationSuccessHandler;
 import com.demo.core.properties.SecurityProperties;
 import com.demo.core.validate.code.ValidateCodeFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+
+import javax.sql.DataSource;
 
 /**
  * 原理：过滤器链
@@ -39,11 +45,24 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
     private MyAuthenticationFailureHandler authenticationFailureHandler;
 
     @Autowired
-    private MyUserDetailService userDetailService;
+    private DataSource dataSource;
+
+    @Bean
+    @ConditionalOnMissingBean(MyUserDetailService.class)
+    public UserDetailsService userDetailsService(){
+        return new MyUserDetailService();
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public PersistentTokenRepository persistentTokenRepository(){
+        JdbcTokenRepositoryImpl jdbcTokenRepository = new JdbcTokenRepositoryImpl();
+        jdbcTokenRepository.setDataSource(dataSource);
+        return jdbcTokenRepository;
     }
 
 
@@ -62,7 +81,10 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
                 .successHandler(authenticationSuccessHandler)
                 .failureHandler(authenticationFailureHandler)
                 .and()
-                .userDetailsService(userDetailService)
+                .rememberMe()
+                .tokenValiditySeconds(securityProperties.getBrowser().getRememberMeInSeconds())
+                .tokenRepository(persistentTokenRepository())
+                .and()
                 .authorizeRequests()
                 .antMatchers("/authentication/require",securityProperties.getBrowser().getLoginPage(),
                         "/code/image").permitAll()
@@ -70,5 +92,14 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticated()
                 .and()
                 .csrf().disable();
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService())
+                .and()
+                .jdbcAuthentication()
+                .passwordEncoder(passwordEncoder())
+                .dataSource(dataSource);
     }
 }
