@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -80,7 +81,8 @@ public class ValidateCodeFilter extends OncePerRequestFilter implements Initiali
         if(type != null){
             logger.info("校验请求(" + request.getRequestURI() + ")中的验证码,验证码类型" + type);
             try {
-                validateCodeProcessorHolder.findValidateCodeProcessor(type);
+                validateCodeProcessorHolder.findValidateCodeProcessor(type)
+                .validate(new ServletWebRequest(request,response));
             }catch (ValidateCodeException exception){
                 authenticationFailureHandler.onAuthenticationFailure(request,response,exception);
                 return;
