@@ -18,7 +18,7 @@ public class ValidateCodeBeanConfig {
     @Autowired
     private SecurityProperties securityProperties;
 
-    @Bean
+    @Bean(name = "imageValidateCodeGenerator" )
     @ConditionalOnMissingBean(name = "imageCodeGenerator")
     public ValidateCodeGenerator imageCodeGenerator(){
         ImageCodeGenerator imageCodeGenerator = new ImageCodeGenerator();
@@ -26,7 +26,7 @@ public class ValidateCodeBeanConfig {
         return imageCodeGenerator;
     }
 
-    @Bean
+    @Bean(name = "smsValidateCodeGenerator")
     @ConditionalOnMissingBean(name = "smsCodeGenerator")
     public ValidateCodeGenerator smsCodeGenerator(){
         SmsCodeGenerator smsCodeGenerator = new SmsCodeGenerator();
