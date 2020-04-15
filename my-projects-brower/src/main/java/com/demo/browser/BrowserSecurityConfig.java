@@ -29,6 +29,22 @@ import javax.sql.DataSource;
  * 不可配置
  *      ExceptionTranslationFilter (异常)
  *      FilterSecurityInterceptor(最后一环) 能不能访问对应接口服务
+ *
+ * 基本原理：过滤器链
+ * securityContextPersistenceFilter
+ * UsernamePasswordAuthenticationFilter
+ * BasicAuthenticationFilter
+ * RememberMeAuthenticationFilter
+ * ExceptionTranslateFilter
+ * filterSecurityInterceptor
+ *
+ * 用户名密码认证方式
+ * UsernamePasswordAuthenticationFIlter
+ *      UsernamePasswordAuthenticationToken
+ * AuthenticationManager
+ * AuthenticationProvider
+ * UserDetailService
+ * UserDetails
  */
 @Configuration
 public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
