@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.social.security.SpringSocialConfigurer;
 
 import javax.sql.DataSource;
 
@@ -67,6 +68,10 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private ValidateCodeSecurityConfig validateCodeSecurityConfig;
 
+    @Autowired
+    private SpringSocialConfigurer mySpringSocialConfig;
+
+
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
@@ -86,23 +91,25 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
         formAuthenticationConfig.configure(http);
 
         http.apply(validateCodeSecurityConfig)
-                    .and()
-                .apply(smsCodeAuthenticationSecurityConfig)
-                    .and()
-                .rememberMe()
-                    .tokenRepository(persistentTokenRepository())
-                    .tokenValiditySeconds(securityProperties.getBrowser().getRememberMeInSeconds())
-                    .userDetailsService(userDetailsService)
-                    .and()
-                .authorizeRequests()
-                    .antMatchers(
-                            SecurityConstants.DEFAULT_UNAUTHENTICATION_URL,
-                            SecurityConstants.DEFAULT_SIGN_IN_PROCESSING_URL_MOBILE,
-                            securityProperties.getBrowser().getLoginPage(),
-                            SecurityConstants.DEFAULT_VALIDATE_CODE_URL_PREFIX+"/*").permitAll()
-                    .anyRequest()
-                    .authenticated()
-                    .and()
-                .csrf().disable();
+                .and()
+            .apply(smsCodeAuthenticationSecurityConfig)
+                .and()
+            .apply(mySpringSocialConfig)
+                .and()
+            .rememberMe()
+                .tokenRepository(persistentTokenRepository())
+                .tokenValiditySeconds(securityProperties.getBrowser().getRememberMeInSeconds())
+                .userDetailsService(userDetailsService)
+                .and()
+            .authorizeRequests()
+                .antMatchers(
+                        SecurityConstants.DEFAULT_UNAUTHENTICATION_URL,
+                        SecurityConstants.DEFAULT_SIGN_IN_PROCESSING_URL_MOBILE,
+                        securityProperties.getBrowser().getLoginPage(),
+                        SecurityConstants.DEFAULT_VALIDATE_CODE_URL_PREFIX+"/*").permitAll()
+                .anyRequest()
+                .authenticated()
+                .and()
+            .csrf().disable();
     }
 }

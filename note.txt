@@ -1,5 +1,8 @@
 我的错误记录：
 1：在设定spring security 时，自定义的login页面不起效，发现是因为我的包名和启动类的不一致导致；
+2：在创建UserCOnnection表的时候，发现错误：Specified key was too long; max key length is 767 bytes
+    原因：没有启用innodb_large_prefix时，索引建前缀限制时767字节，我设置的时varchar(255) 字符集时utf8mb4
+    4*255>767,所以开启这个，长度限制就会达到3072
 
 
 oauth协议--授权码模式
@@ -10,4 +13,28 @@ oauth协议--授权码模式
 3.认证服务器返回授权码给client
 4.client向认证服务器申请令牌
 5.认证服务器发送令牌给client
+6.获取用户信息
+7.根据用户信息构建Authentication并放入SecurityContext
 
+spring social 原理
+将上面整个流程封装到SocialAuthenticationFilter
+1~6与服务提供商打交道
+    ServiceProvider(AbstractOAuth2ServiceProvider)
+       1-5：OAuth2Operations(Oauth2Template)
+        6：Api(AbstractOAuth2ApiBinding)
+
+7第三方应用内部
+    ConnectionFactory(OAuth2ConnectionFactory)
+        --ServiceProvider
+        --ApiAdapter
+              在api和connection之间做适配
+    |
+    |生产
+    |
+    Connection(OAuth2Connection)
+    --connection字段是固定的
+
+    DB(UserConnection表业务表和服务提供商用户信息)
+
+    UserConnectionRepository(JdbcUsersConnectionRepository)存储器
+    --针对UserConnection做一些操作
