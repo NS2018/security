@@ -3,6 +3,7 @@ package com.demo.core.properties;
 public class BrowserProperties {
 
     private String loginPage = "/signIn.html";
+    private String signUpUrl = "/signUp.html";
 
     //默认返回类型
     private LoginType loginType = LoginType.JSON;
@@ -31,5 +32,13 @@ public class BrowserProperties {
 
     public void setRememberMeInSeconds(int rememberMeInSeconds) {
         this.rememberMeInSeconds = rememberMeInSeconds;
+    }
+
+    public String getSignUpUrl() {
+        return signUpUrl;
+    }
+
+    public void setSignUpUrl(String signUpUrl) {
+        this.signUpUrl = signUpUrl;
     }
 }
