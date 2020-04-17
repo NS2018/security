@@ -54,10 +54,17 @@ public class QQUserInfo {
      * 	大小为100×100像素的QQ头像URL。需要注意，不是所有的用户都拥有QQ的100×100的头像，但40×40像素则是一定会有。
      */
     private String figureurl_qq_2;
+
+    private String figureurl_qq;
     /**
      * 	性别。 如果获取不到则默认返回”男”
      */
     private String gender;
+
+    /**
+     * 	性别枚举。
+     */
+    private String gender_type;
     /**
      * 	标识用户是否为黄钻用户（0：不是；1：是）。
      */
@@ -78,6 +85,18 @@ public class QQUserInfo {
      * 标识是否为年费黄钻用户（0：不是； 1：是）
      */
     private String is_yellow_year_vip;
+
+    private String constellation;
+
+    private String figureurl_type;
+
+    public String getConstellation() {
+        return constellation;
+    }
+
+    public void setConstellation(String constellation) {
+        this.constellation = constellation;
+    }
 
     public String getRet() {
         return ret;
@@ -229,5 +248,29 @@ public class QQUserInfo {
 
     public void setIs_yellow_year_vip(String is_yellow_year_vip) {
         this.is_yellow_year_vip = is_yellow_year_vip;
+    }
+
+    public String getGender_type() {
+        return gender_type;
+    }
+
+    public void setGender_type(String gender_type) {
+        this.gender_type = gender_type;
+    }
+
+    public String getFigureurl_type() {
+        return figureurl_type;
+    }
+
+    public void setFigureurl_type(String figureurl_type) {
+        this.figureurl_type = figureurl_type;
+    }
+
+    public String getFigureurl_qq() {
+        return figureurl_qq;
+    }
+
+    public void setFigureurl_qq(String figureurl_qq) {
+        this.figureurl_qq = figureurl_qq;
     }
 }
