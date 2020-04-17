@@ -29,7 +29,7 @@ public class MyUserDetailService implements UserDetailsService, SocialUserDetail
 
         logger.info("表单登录用户名："+username);
 
-        return buildUser();
+        return buildUser(username);
     }
 
     @Override
@@ -37,14 +37,14 @@ public class MyUserDetailService implements UserDetailsService, SocialUserDetail
 
         logger.info("社交登录用户名："+userId);
 
-        return buildUser();
+        return buildUser(userId);
     }
 
-    private SocialUserDetails buildUser(){
+    private SocialUserDetails buildUser(String userId){
 
         String password = passwordEncoder.encode("123456");
         logger.info("数据库密码是："+password);
-        return new SocialUser("tom",
+        return new SocialUser(userId,
                 password,
                 true,
                 true,
