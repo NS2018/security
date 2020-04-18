@@ -1,5 +1,6 @@
 package com.demo.browser;
 
+import com.demo.browser.session.MyExpiredSessionStrategy;
 import com.demo.core.authentication.FormAuthenticationConfig;
 import com.demo.core.authentication.mobile.SmsCodeAuthenticationSecurityConfig;
 import com.demo.core.properties.SecurityConstants;
@@ -101,6 +102,13 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
                 .tokenValiditySeconds(securityProperties.getBrowser().getRememberMeInSeconds())
                 .userDetailsService(userDetailsService)
                 .and()
+            .sessionManagement()
+                .invalidSessionUrl("/session/invalid")
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(true)
+                .expiredSessionStrategy(new MyExpiredSessionStrategy())
+                .and()
+                .and()
             .authorizeRequests()
                 .antMatchers(
                         SecurityConstants.DEFAULT_UNAUTHENTICATION_URL,
@@ -108,7 +116,7 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
                         securityProperties.getBrowser().getLoginPage(),
                         SecurityConstants.DEFAULT_VALIDATE_CODE_URL_PREFIX+"/*",
                         securityProperties.getBrowser().getSignUpUrl(),
-                        "/user/regist").permitAll()
+                        "/user/regist","/session/invalid").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

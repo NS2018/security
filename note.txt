@@ -4,6 +4,9 @@
     原因：没有启用innodb_large_prefix时，索引建前缀限制时767字节，我设置的时varchar(255) 字符集时utf8mb4
     4*255>767,所以开启这个，长度限制就会达到3072
 
+3:springboot session超时时间至少是1分钟
+
+
 
 教训：
 1：永远不要用system.out打印信息 用日志打印
