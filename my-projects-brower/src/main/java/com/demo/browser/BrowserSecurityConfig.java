@@ -1,5 +1,6 @@
 package com.demo.browser;
 
+import com.demo.browser.logout.MyLogoutController;
 import com.demo.browser.session.MyExpiredSessionStrategy;
 import com.demo.core.authentication.FormAuthenticationConfig;
 import com.demo.core.authentication.mobile.SmsCodeAuthenticationSecurityConfig;
@@ -7,6 +8,7 @@ import com.demo.core.properties.SecurityConstants;
 import com.demo.core.properties.SecurityProperties;
 import com.demo.core.validate.code.ValidateCodeSecurityConfig;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.social.security.SpringSocialConfigurer;
@@ -86,6 +89,11 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
+    @Bean
+    @ConditionalOnMissingBean(MyLogoutController.class)
+    public LogoutSuccessHandler logoutSuccessHandler(){
+        return new MyLogoutController(securityProperties.getBrowser().getLogoutUrl());
+    }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
@@ -109,6 +117,10 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
                 .expiredSessionStrategy(new MyExpiredSessionStrategy())
                 .and()
                 .and()
+            .logout()
+                .logoutUrl("/logout")
+                .logoutSuccessHandler(logoutSuccessHandler())
+                .and()
             .authorizeRequests()
                 .antMatchers(
                         SecurityConstants.DEFAULT_UNAUTHENTICATION_URL,
@@ -116,7 +128,7 @@ public class BrowserSecurityConfig extends WebSecurityConfigurerAdapter {
                         securityProperties.getBrowser().getLoginPage(),
                         SecurityConstants.DEFAULT_VALIDATE_CODE_URL_PREFIX+"/*",
                         securityProperties.getBrowser().getSignUpUrl(),
-                        "/user/regist","/session/invalid").permitAll()
+                        "/user/regist","/session/invalid",securityProperties.getBrowser().getLogoutUrl()).permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

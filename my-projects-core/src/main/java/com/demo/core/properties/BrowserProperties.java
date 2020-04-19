@@ -4,6 +4,8 @@ public class BrowserProperties {
 
     private String loginPage = "/signIn.html";
     private String signUpUrl = "/signUp.html";
+    private String logoutUrl;
+
 
     //默认返回类型
     private LoginType loginType = LoginType.JSON;
@@ -40,5 +42,13 @@ public class BrowserProperties {
 
     public void setSignUpUrl(String signUpUrl) {
         this.signUpUrl = signUpUrl;
+    }
+
+    public String getLogoutUrl() {
+        return logoutUrl;
+    }
+
+    public void setLogoutUrl(String logoutUrl) {
+        this.logoutUrl = logoutUrl;
     }
 }
