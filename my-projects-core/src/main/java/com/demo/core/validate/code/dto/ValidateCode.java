@@ -1,12 +1,12 @@
 package com.demo.core.validate.code.dto;
 
-import java.awt.image.BufferedImage;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
  * 图形验证码
  */
-public class ValidateCode {
+public class ValidateCode implements Serializable {
 
     private String code;
 
